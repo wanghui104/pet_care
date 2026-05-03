@@ -903,6 +903,67 @@
       grid-column: 1 / -1;
     }
 
+    .busy-meter {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      background: #f7faf5;
+      border: 1px solid rgba(35, 48, 43, 0.12);
+      border-radius: var(--radius);
+    }
+
+    .busy-meter-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      color: #42524b;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .busy-meter-head span {
+      color: var(--sage-dark);
+    }
+
+    .busy-bars {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      align-items: end;
+      gap: 7px;
+      min-height: 92px;
+    }
+
+    .busy-bar-wrap {
+      display: grid;
+      grid-template-rows: 72px auto;
+      align-items: end;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .busy-bar {
+      width: 100%;
+      min-height: 10px;
+      border-radius: 6px 6px 3px 3px;
+      background: rgba(111, 144, 125, 0.35);
+      transition: height 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .busy-bar.is-active {
+      background: var(--coral);
+      box-shadow: 0 8px 18px rgba(233, 135, 113, 0.28);
+    }
+
+    .busy-time {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+      text-align: center;
+      white-space: nowrap;
+    }
+
     .booking-form .btn {
       border: 0;
       font-size: 16px;
@@ -1483,13 +1544,20 @@
                 <option>舒缓 SPA</option>
               </select>
             </label>
+            <div class="busy-meter full" aria-label="预约时段忙碌程度">
+              <div class="busy-meter-head">
+                <strong>到店忙碌度</strong>
+                <span id="busySummary">请选择期望日期和时间</span>
+              </div>
+              <div class="busy-bars" id="busyBars"></div>
+            </div>
             <label>
               期望日期
               <input type="date" name="date" required>
             </label>
             <label>
               期望时间
-              <input type="time" name="time" required>
+              <input type="time" name="time" min="10:00" max="20:00" step="900" required>
             </label>
             <label class="full">
               备注
@@ -1512,6 +1580,10 @@
   <script>
     const bookingForm = document.querySelector("#bookingForm");
     const formStatus = document.querySelector("#formStatus");
+    const dateInput = bookingForm.querySelector('input[name="date"]');
+    const timeInput = bookingForm.querySelector('input[name="time"]');
+    const busyBars = document.querySelector("#busyBars");
+    const busySummary = document.querySelector("#busySummary");
     const environmentSlides = document.querySelectorAll("[data-environment-slide]");
     const environmentTabs = document.querySelectorAll("[data-environment-tab]");
     const environmentTitle = document.querySelector("[data-environment-title]");
@@ -1534,6 +1606,97 @@
     ];
     let environmentIndex = 0;
     let environmentTimer;
+    const businessHours = ["10", "11", "12", "13", "14", "15", "16", "17", "18", "19"];
+    const busyProfiles = {
+      weekday: {
+        label: "周一至周四",
+        values: [28, 42, 58, 46, 36, 48, 66, 78, 61, 34]
+      },
+      friday: {
+        label: "周五",
+        values: [32, 46, 60, 54, 50, 64, 82, 96, 88, 62]
+      },
+      weekend: {
+        label: "周六日",
+        values: [58, 74, 90, 84, 70, 78, 94, 100, 86, 64]
+      }
+    };
+
+    const getBusyProfile = (dateValue) => {
+      if (!dateValue) {
+        return busyProfiles.weekday;
+      }
+
+      const day = new Date(`${dateValue}T00:00:00`).getDay();
+
+      if (day === 5) {
+        return busyProfiles.friday;
+      }
+
+      if (day === 0 || day === 6) {
+        return busyProfiles.weekend;
+      }
+
+      return busyProfiles.weekday;
+    };
+
+    const getBusyLevel = (value) => {
+      if (value >= 82) {
+        return "很忙";
+      }
+
+      if (value >= 62) {
+        return "较忙";
+      }
+
+      if (value >= 42) {
+        return "适中";
+      }
+
+      return "较空";
+    };
+
+    const getActiveBusyIndex = (timeValue) => {
+      if (!timeValue) {
+        return -1;
+      }
+
+      const hour = Number(timeValue.split(":")[0]);
+
+      if (Number.isNaN(hour)) {
+        return -1;
+      }
+
+      return Math.max(0, Math.min(businessHours.length - 1, hour - 10));
+    };
+
+    const updateBusyMeter = () => {
+      const profile = getBusyProfile(dateInput.value);
+      const activeIndex = getActiveBusyIndex(timeInput.value);
+
+      busyBars.innerHTML = profile.values.map((value, index) => {
+        const isActive = index === activeIndex;
+        const timeLabel = `${businessHours[index]}:00`;
+        const level = getBusyLevel(value);
+        const barHeight = Math.max(10, Math.round(value * 0.72));
+
+        return `
+          <div class="busy-bar-wrap" title="${timeLabel} ${level}">
+            <span class="busy-bar${isActive ? " is-active" : ""}" style="height: ${barHeight}px"></span>
+            <span class="busy-time">${businessHours[index]}</span>
+          </div>
+        `;
+      }).join("");
+
+      if (activeIndex === -1) {
+        busySummary.textContent = `${profile.label}分布，选择时间后高亮对应时段`;
+        return;
+      }
+
+      const activeValue = profile.values[activeIndex];
+      const activeHour = businessHours[activeIndex];
+      busySummary.textContent = `${profile.label} ${activeHour}:00 附近预计${getBusyLevel(activeValue)}`;
+    };
 
     const showEnvironmentSlide = (index) => {
       environmentIndex = (index + environmentSlides.length) % environmentSlides.length;
@@ -1577,6 +1740,9 @@
     });
 
     startEnvironmentCarousel();
+    updateBusyMeter();
+    dateInput.addEventListener("input", updateBusyMeter);
+    timeInput.addEventListener("input", updateBusyMeter);
 
     bookingForm.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -1588,6 +1754,7 @@
 
       formStatus.classList.add("is-visible");
       bookingForm.reset();
+      updateBusyMeter();
     });
   </script>
 </body>
