@@ -1,0 +1,19 @@
+{
+  "name": "pet-care-next",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "C:\\Progra~1\\nodejs\\node.exe node_modules/next/dist/bin/next dev",
+    "build": "C:\\Progra~1\\nodejs\\node.exe node_modules/next/dist/bin/next build",
+    "start": "C:\\Progra~1\\nodejs\\node.exe node_modules/next/dist/bin/next start",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "next": "^15.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^10.3.0"
+  }
+}
