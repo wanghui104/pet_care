@@ -26,13 +26,61 @@ const environmentContent = [
   },
 ];
 
+const reviewContent = [
+  {
+    stars: "★★★★★",
+    text: "我家小狗以前很怕吹风，这次护理师一直安抚，结束后毛很蓬松，状态也很放松。",
+    name: "豆豆家长",
+    detail: "柯基洗护 · 第 3 次到店",
+  },
+  {
+    stars: "★★★★★",
+    text: "预约时间准，店里很干净。修剪前会确认想要的长度，成品比我预期还自然。",
+    name: "Mika 家长",
+    detail: "贵宾精修 · 造型护理",
+  },
+  {
+    stars: "★★★★★",
+    text: "猫咪洗护做得很稳，回家没有应激。还提醒了耳朵清洁和换季梳毛频率。",
+    name: "团团家长",
+    detail: "长毛猫洗护 · 低应激护理",
+  },
+  {
+    stars: "★★★★★",
+    text: "第一次带老年犬来，护理师会放慢节奏，中途还发了照片。接回家时它整只都很舒服。",
+    name: "拿铁家长",
+    detail: "老年犬护理 · 温和洗浴",
+  },
+  {
+    stars: "★★★★★",
+    text: "之前打结比较严重，店里没有硬拉，先说明处理方式和价格，剪完干净又不突兀。",
+    name: "糯米家长",
+    detail: "打结处理 · 局部修剪",
+  },
+  {
+    stars: "★★★★★",
+    text: "能看出来工具和浴区都有消毒，香味也不冲。小猫回家一直舔毛，但没有躲起来。",
+    name: "栗子家长",
+    detail: "幼猫首洗 · 基础护理",
+  },
+];
+
+const reviewPages = Array.from({ length: Math.ceil(reviewContent.length / 3) }, (_, index) =>
+  reviewContent.slice(index * 3, index * 3 + 3)
+);
+
 export default function Home() {
   const [environmentIndex, setEnvironmentIndex] = useState(0);
+  const [reviewIndex, setReviewIndex] = useState(0);
   const [isFormStatusVisible, setIsFormStatusVisible] = useState(false);
   const activeEnvironment = environmentContent[environmentIndex];
 
   const showEnvironmentSlide = (index) => {
     setEnvironmentIndex((index + environmentContent.length) % environmentContent.length);
+  };
+
+  const showReviewSlide = (index) => {
+    setReviewIndex((index + reviewPages.length) % reviewPages.length);
   };
 
   useEffect(() => {
@@ -42,6 +90,14 @@ export default function Home() {
 
     return () => window.clearInterval(timer);
   }, [environmentIndex]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setReviewIndex((currentIndex) => (currentIndex + 1) % reviewPages.length);
+    }, 4800);
+
+    return () => window.clearInterval(timer);
+  }, [reviewIndex]);
 
   const handleBookingSubmit = (event) => {
     event.preventDefault();
@@ -429,22 +485,43 @@ export default function Home() {
                 </div>
                 <p>我们更在意宠物在护理过程中的感受。洗得干净，也要让它们愿意下次再来。</p>
               </div>
-              <div className="review-grid">
-                <article className="review-card">
-                  <div className="stars">★★★★★</div>
-                  <p>我家小狗以前很怕吹风，这次护理师一直安抚，结束后毛很蓬松，状态也很放松。</p>
-                  <div className="reviewer">豆豆家长</div>
-                </article>
-                <article className="review-card">
-                  <div className="stars">★★★★★</div>
-                  <p>预约时间准，店里很干净。修剪前会确认想要的长度，成品比我预期还自然。</p>
-                  <div className="reviewer">Mika 家长</div>
-                </article>
-                <article className="review-card">
-                  <div className="stars">★★★★★</div>
-                  <p>猫咪洗护做得很稳，回家没有应激。还提醒了耳朵清洁和换季梳毛频率。</p>
-                  <div className="reviewer">团团家长</div>
-                </article>
+              <div className="review-carousel" style={{ "--review-index": reviewIndex }}>
+                <div className="review-track">
+                  {reviewPages.map((page, pageIndex) => (
+                    <div className="review-grid" key={pageIndex} aria-hidden={pageIndex !== reviewIndex}>
+                      {page.map((review) => (
+                        <article className="review-card" key={review.name}>
+                          <div className="stars">{review.stars}</div>
+                          <p>{review.text}</p>
+                          <div className="reviewer">
+                            <span>{review.name}</span>
+                            <small>{review.detail}</small>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="review-controls" aria-label="客户评价轮播">
+                <button className="review-arrow" type="button" aria-label="上一组评价" onClick={() => showReviewSlide(reviewIndex - 1)}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <div className="review-dots">
+                  {reviewPages.map((_, index) => (
+                    <button
+                      className={`review-dot${index === reviewIndex ? " active" : ""}`}
+                      type="button"
+                      key={index}
+                      aria-label={`查看第 ${index + 1} 组评价`}
+                      aria-current={index === reviewIndex}
+                      onClick={() => showReviewSlide(index)}
+                    />
+                  ))}
+                </div>
+                <button className="review-arrow" type="button" aria-label="下一组评价" onClick={() => showReviewSlide(reviewIndex + 1)}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
               </div>
             </div>
           </section>

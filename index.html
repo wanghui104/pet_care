@@ -802,13 +802,30 @@
       background: var(--white);
     }
 
+    .review-carousel {
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .review-track {
+      display: flex;
+      transform: translateX(calc(var(--review-index, 0) * -100%));
+      transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+      will-change: transform;
+    }
+
     .review-grid {
       display: grid;
+      flex: 0 0 100%;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 18px;
     }
 
     .review-card {
+      display: flex;
+      min-height: 245px;
+      flex-direction: column;
+      justify-content: space-between;
       padding: 24px;
     }
 
@@ -820,8 +837,76 @@
 
     .reviewer {
       margin-top: 20px;
+      display: grid;
+      gap: 3px;
       font-weight: 800;
       color: var(--sage-dark);
+    }
+
+    .reviewer small {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .review-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .review-arrow,
+    .review-dot {
+      border: 0;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .review-arrow {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      color: var(--sage-dark);
+      background: var(--mist);
+      border-radius: 50%;
+    }
+
+    .review-arrow:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(35, 48, 43, 0.12);
+    }
+
+    .review-arrow svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .review-dots {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .review-dot {
+      width: 9px;
+      height: 9px;
+      padding: 0;
+      background: rgba(56, 95, 81, 0.24);
+      border-radius: 50%;
+    }
+
+    .review-dot.active {
+      width: 28px;
+      background: var(--coral);
+      border-radius: 999px;
     }
 
     .booking {
@@ -1118,6 +1203,12 @@
       .step-number {
         width: 44px;
         height: 44px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .review-track {
+        transition: none;
       }
     }
   </style>
@@ -1483,22 +1574,55 @@
           </div>
           <p>我们更在意宠物在护理过程中的感受。洗得干净，也要让它们愿意下次再来。</p>
         </div>
-        <div class="review-grid">
-          <article class="review-card">
-            <div class="stars">★★★★★</div>
-            <p>我家小狗以前很怕吹风，这次护理师一直安抚，结束后毛很蓬松，状态也很放松。</p>
-            <div class="reviewer">豆豆家长</div>
-          </article>
-          <article class="review-card">
-            <div class="stars">★★★★★</div>
-            <p>预约时间准，店里很干净。修剪前会确认想要的长度，成品比我预期还自然。</p>
-            <div class="reviewer">Mika 家长</div>
-          </article>
-          <article class="review-card">
-            <div class="stars">★★★★★</div>
-            <p>猫咪洗护做得很稳，回家没有应激。还提醒了耳朵清洁和换季梳毛频率。</p>
-            <div class="reviewer">团团家长</div>
-          </article>
+        <div class="review-carousel" data-review-carousel style="--review-index: 0">
+          <div class="review-track">
+            <div class="review-grid" data-review-page>
+              <article class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>我家小狗以前很怕吹风，这次护理师一直安抚，结束后毛很蓬松，状态也很放松。</p>
+                <div class="reviewer"><span>豆豆家长</span><small>柯基洗护 · 第 3 次到店</small></div>
+              </article>
+              <article class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>预约时间准，店里很干净。修剪前会确认想要的长度，成品比我预期还自然。</p>
+                <div class="reviewer"><span>Mika 家长</span><small>贵宾精修 · 造型护理</small></div>
+              </article>
+              <article class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>猫咪洗护做得很稳，回家没有应激。还提醒了耳朵清洁和换季梳毛频率。</p>
+                <div class="reviewer"><span>团团家长</span><small>长毛猫洗护 · 低应激护理</small></div>
+              </article>
+            </div>
+            <div class="review-grid" data-review-page aria-hidden="true">
+              <article class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>第一次带老年犬来，护理师会放慢节奏，中途还发了照片。接回家时它整只都很舒服。</p>
+                <div class="reviewer"><span>拿铁家长</span><small>老年犬护理 · 温和洗浴</small></div>
+              </article>
+              <article class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>之前打结比较严重，店里没有硬拉，先说明处理方式和价格，剪完干净又不突兀。</p>
+                <div class="reviewer"><span>糯米家长</span><small>打结处理 · 局部修剪</small></div>
+              </article>
+              <article class="review-card">
+                <div class="stars">★★★★★</div>
+                <p>能看出来工具和浴区都有消毒，香味也不冲。小猫回家一直舔毛，但没有躲起来。</p>
+                <div class="reviewer"><span>栗子家长</span><small>幼猫首洗 · 基础护理</small></div>
+              </article>
+            </div>
+          </div>
+        </div>
+        <div class="review-controls" aria-label="客户评价轮播">
+          <button class="review-arrow" type="button" aria-label="上一组评价" data-review-prev>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <div class="review-dots">
+            <button class="review-dot active" type="button" aria-label="查看第 1 组评价" aria-current="true" data-review-dot="0"></button>
+            <button class="review-dot" type="button" aria-label="查看第 2 组评价" aria-current="false" data-review-dot="1"></button>
+          </div>
+          <button class="review-arrow" type="button" aria-label="下一组评价" data-review-next>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
         </div>
       </div>
     </section>
@@ -1590,6 +1714,11 @@
     const environmentCopy = document.querySelector("[data-environment-copy]");
     const environmentPrev = document.querySelector("[data-environment-prev]");
     const environmentNext = document.querySelector("[data-environment-next]");
+    const reviewCarousel = document.querySelector("[data-review-carousel]");
+    const reviewPages = document.querySelectorAll("[data-review-page]");
+    const reviewDots = document.querySelectorAll("[data-review-dot]");
+    const reviewPrev = document.querySelector("[data-review-prev]");
+    const reviewNext = document.querySelector("[data-review-next]");
     const environmentContent = [
       {
         title: "前台接待与等候区",
@@ -1606,6 +1735,8 @@
     ];
     let environmentIndex = 0;
     let environmentTimer;
+    let reviewIndex = 0;
+    let reviewTimer;
     const businessHours = ["10", "11", "12", "13", "14", "15", "16", "17", "18", "19"];
     const busyProfiles = {
       weekday: {
@@ -1722,6 +1853,28 @@
       }, 5200);
     };
 
+    const showReviewSlide = (index) => {
+      reviewIndex = (index + reviewPages.length) % reviewPages.length;
+      reviewCarousel.style.setProperty("--review-index", reviewIndex);
+
+      reviewPages.forEach((page, pageIndex) => {
+        page.setAttribute("aria-hidden", String(pageIndex !== reviewIndex));
+      });
+
+      reviewDots.forEach((dot, dotIndex) => {
+        const isActive = dotIndex === reviewIndex;
+        dot.classList.toggle("active", isActive);
+        dot.setAttribute("aria-current", String(isActive));
+      });
+    };
+
+    const startReviewCarousel = () => {
+      window.clearInterval(reviewTimer);
+      reviewTimer = window.setInterval(() => {
+        showReviewSlide(reviewIndex + 1);
+      }, 4800);
+    };
+
     environmentPrev.addEventListener("click", () => {
       showEnvironmentSlide(environmentIndex - 1);
       startEnvironmentCarousel();
@@ -1739,7 +1892,25 @@
       });
     });
 
+    reviewPrev.addEventListener("click", () => {
+      showReviewSlide(reviewIndex - 1);
+      startReviewCarousel();
+    });
+
+    reviewNext.addEventListener("click", () => {
+      showReviewSlide(reviewIndex + 1);
+      startReviewCarousel();
+    });
+
+    reviewDots.forEach((dot) => {
+      dot.addEventListener("click", () => {
+        showReviewSlide(Number(dot.dataset.reviewDot));
+        startReviewCarousel();
+      });
+    });
+
     startEnvironmentCarousel();
+    startReviewCarousel();
     updateBusyMeter();
     dateInput.addEventListener("input", updateBusyMeter);
     timeInput.addEventListener("input", updateBusyMeter);
