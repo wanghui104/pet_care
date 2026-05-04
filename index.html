@@ -613,15 +613,16 @@
 
     .location-layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.16fr) minmax(300px, 0.84fr);
-      gap: 38px;
-      align-items: center;
+      grid-template-columns: 1fr;
+      gap: 30px;
+      align-items: stretch;
     }
 
     .pet-map {
       position: relative;
-      aspect-ratio: 3 / 2;
-      min-height: 430px;
+      order: 2;
+      aspect-ratio: 1513 / 1040;
+      min-height: 0;
       overflow: hidden;
       border: 1px solid rgba(35, 48, 43, 0.12);
       border-radius: var(--radius);
@@ -632,8 +633,8 @@
     .pet-map img {
       width: 100%;
       height: 100%;
-      min-height: 430px;
-      object-fit: cover;
+      display: block;
+      object-fit: contain;
     }
 
     .pet-map svg {
@@ -699,6 +700,11 @@
       stroke-width: 1.5;
     }
 
+    .location-copy {
+      order: 1;
+      max-width: 920px;
+    }
+
     .location-copy h2 {
       margin-bottom: 14px;
       font-size: clamp(30px, 3.2vw, 46px);
@@ -713,6 +719,7 @@
 
     .location-details {
       display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 14px;
       margin-top: 26px;
     }
@@ -1018,9 +1025,12 @@
       .review-grid,
       .process-layout,
       .environment-carousel,
-      .location-layout,
       .booking-layout {
         grid-template-columns: 1fr 1fr;
+      }
+
+      .location-layout {
+        grid-template-columns: 1fr;
       }
 
       .process-layout,
@@ -1105,9 +1115,8 @@
         padding: 24px;
       }
 
-      .pet-map,
-      .pet-map img {
-        min-height: 330px;
+      .location-details {
+        grid-template-columns: 1fr;
       }
 
       .process-list li {
